@@ -26,6 +26,8 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Solve
+      Tetrimino
   other-modules:
       Paths_tetris_fill
   hs-source-dirs:
