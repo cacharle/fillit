@@ -4,7 +4,7 @@ module Solve
     ) where
 
 
-import Data.List (find)
+import Data.List (find, delete)
 import Data.Maybe (isJust, fromJust)
 import Control.Monad (join)
 import Control.Applicative ((<|>))
@@ -15,7 +15,7 @@ import Tetrimino
 
 
 solve :: [Tetrimino] -> [Tetrimino]
-solve ts = fromJust $ join $ find isJust $ map (solveSize ts) [minSize..]
+solve ts = fromJust $ join $ find isJust $ map (solveSize ts) [(minSize - 1)..]
     where minSize = ceiling $ logBase 2 $ fromIntegral cellCount
           cellCount = sum $ map (length . getPositions) ts
 
@@ -23,30 +23,15 @@ solve ts = fromJust $ join $ find isJust $ map (solveSize ts) [minSize..]
 solveSize :: [Tetrimino] -> Int -> Maybe [Tetrimino]
 solveSize ts size = solveRec size [] ts
 
-
-
--- func backtrack(state)
---      if accept(state)
---          return Just state
---      if reject(state)
---          return Nothing
---      for subState in availableStates(state)
---          backtrack(subState)
---      end
--- end
-
-
-
-
 solveRec :: Int -> [Tetrimino] -> [Tetrimino] -> Maybe [Tetrimino]
-solveRec size state ts
-    | length state == length ts = Just state
-    | otherwise = do
-        subStates <- sequence
-                     $ filter isJust
-                     $ map (firstValidSpot size state)
-                     $ filter (flip notElem state) ts
-        join $ find isJust $ map (\s -> solveRec size s ts) subStates
+solveRec size state [] = Just state
+solveRec size state ts = do
+    subStates <- sequence
+                 $ filter isJust
+                 $ map (firstValidSpot size state)
+                 $ ts
+    join $ find isJust
+        $ map (\subState@(s:_) -> solveRec size subState (delete s ts)) subStates
 
 
 firstValidSpot :: Int -> [Tetrimino] -> Tetrimino -> Maybe [Tetrimino]
