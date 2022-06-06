@@ -4,11 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           tetris-fill
+name:           fillit
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/tetris-fill#readme>
-homepage:       https://github.com/githubuser/tetris-fill#readme
-bug-reports:    https://github.com/githubuser/tetris-fill/issues
+description:    Please see the README on GitHub at <https://github.com/githubuser/fillit#readme>
+homepage:       https://github.com/githubuser/fillit#readme
+bug-reports:    https://github.com/githubuser/fillit/issues
 author:         Author name here
 maintainer:     example@example.com
 copyright:      2022 Author name here
@@ -21,7 +21,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/tetris-fill
+  location: https://github.com/githubuser/fillit
 
 library
   exposed-modules:
@@ -36,7 +36,7 @@ library
       base >=4.7 && <5
   default-language: Haskell2010
 
-executable tetris-fill-exe
+executable fillit-exe
   main-is: Main.hs
   other-modules:
       Paths_tetris_fill
@@ -45,10 +45,10 @@ executable tetris-fill-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , tetris-fill
+    , fillit
   default-language: Haskell2010
 
-test-suite tetris-fill-test
+test-suite fillit-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
@@ -58,5 +58,5 @@ test-suite tetris-fill-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , tetris-fill
+    , fillit
   default-language: Haskell2010

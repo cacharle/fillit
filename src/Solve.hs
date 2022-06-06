@@ -21,27 +21,25 @@ solve ts = fromJust $ join $ find isJust $ map (solveSize ts) [(minSize - 1)..]
 
 
 solveSize :: [Tetrimino] -> Int -> Maybe [Tetrimino]
-solveSize ts size = solveRec size [] ts
+solveSize ts size = solveRec [] ts
+    where
 
-solveRec :: Int -> [Tetrimino] -> [Tetrimino] -> Maybe [Tetrimino]
-solveRec size state [] = Just state
-solveRec size state ts = do
-    subStates <- sequence
-                 $ filter isJust
-                 $ map (firstValidSpot size state)
-                 $ ts
-    join $ find isJust
-        $ map (\subState@(s:_) -> solveRec size subState (delete s ts)) subStates
+        solveRec :: [Tetrimino] -> [Tetrimino] -> Maybe [Tetrimino]
+        solveRec state [] = Just state
+        solveRec state ts = do
+            subStates <- sequence $ filter isJust $ map firstValidSpot $ ts
+            join $ find isJust
+                $ map (\subState@(s:_) -> solveRec subState (delete s ts)) subStates
+            where
 
-
-firstValidSpot :: Int -> [Tetrimino] -> Tetrimino -> Maybe [Tetrimino]
-firstValidSpot size state t@(Tetrimino pos)
-    | not $ overlap state t          = Just (t:state)
-    | any (\(y, _) -> y >= size) pos = Nothing
-    | any (\(_, x) -> x >= size) pos = firstValidSpot size state downTetrimino
-    | otherwise                      = firstValidSpot size state rightTetrimino
-    where rightTetrimino = shift 0 1 t
-          downTetrimino  = shift 1 0 $ normalizeX t
+                firstValidSpot :: Tetrimino -> Maybe [Tetrimino]
+                firstValidSpot t@(Tetrimino pos)
+                    | not $ overlap state t          = Just (t:state)
+                    | any (\(y, _) -> y >= size) pos = Nothing
+                    | any (\(_, x) -> x >= size) pos = firstValidSpot downTetrimino
+                    | otherwise                      = firstValidSpot rightTetrimino
+                    where rightTetrimino = shift 0 1 t
+                          downTetrimino  = shift 1 0 $ normalizeX t
 
 
 showSolve :: [Tetrimino] -> String
