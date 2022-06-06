@@ -1,37 +1,42 @@
 module Tetrimino
     ( Tetrimino(..)
-    , readTetrimino
+    , readTetriminoFromLines
     , readTetriminos
     , shift
     , normalize
     , normalizeY
     , normalizeX
     , overlap
-    , showTetrimino
+    , showWithSizeAndId
     ) where
 
 
-import Data.List
+import Data.List (intersect, elemIndices, dropWhileEnd)
 import Data.Char (isSpace)
 
 
 type Positions = [(Int, Int)]
 newtype Tetrimino = Tetrimino { getPositions :: Positions }
 
+readTetrimino :: String -> Either String Tetrimino
+readTetrimino = readTetriminoFromLines . lines
 
-readTetrimino :: [String] -> Either String Tetrimino
-readTetrimino ls
+readTetriminoFromLines :: [String] -> Either String Tetrimino
+readTetriminoFromLines ls
     | length ls /= 4                   = Left "Has to be 4 lines long"
     | any ((/= 4) . length) ls         = Left "Each line has to be 4 characters long"
     | any (any (flip notElem "#.")) ls = Left "Can only contain '#' and '.'"
-    | otherwise = Right $ Tetrimino $
-        map (\i -> (i `div` 4, i `mod` 4)) $ elemIndices '#' $ concat ls
+    | otherwise = if isValid parsedTetrimino
+                    then Right $ normalize parsedTetrimino
+                    else Left "Has to contain 4 cell attached to each other"
+    where parsedTetrimino = Tetrimino $
+            map (\i -> (i `div` 4, i `mod` 4)) $ elemIndices '#' $ concat ls
 
 
 readTetriminos :: String -> Either String [Tetrimino]
 readTetriminos s = let s' = trimSpaces s
                        ls = map trimSpaces (lines s')
-                   in  sequence $ map readTetrimino $ splitWhen (=="") ls
+                   in  sequence $ map readTetriminoFromLines $ splitWhen (=="") ls
     where trimSpaces = dropWhile isSpace . dropWhileEnd isSpace
           -- TODO: install split package
           splitWhen :: Eq a => (a -> Bool) -> [a] -> [[a]]
@@ -41,26 +46,26 @@ readTetriminos s = let s' = trimSpaces s
                                   where (x, xs'') = break p xs'
 
 
-showTetrimino :: Int -> Char -> Tetrimino -> String
-showTetrimino squareSize c (Tetrimino pos) =
+showWithSizeAndId :: Int -> Char -> Tetrimino -> String
+showWithSizeAndId squareSize c (Tetrimino pos) =
     unlines [
         [if (y, x) `elem` pos then c else '.' | x <- [0..squareSize]]
         | y <- [0..squareSize]
     ]
 
 instance Show Tetrimino where
-    show t@(Tetrimino pos) = showTetrimino squareSize '#' t
+    show t@(Tetrimino pos) = showWithSizeAndId squareSize '#' t
         where squareSize = maximum (map (uncurry max) pos)
 
 
 isValid :: Tetrimino -> Bool
-isValid (Tetrimino pos) = length pos == 4 && all isValidPos pos
-    where isValidPos (y, x) = all (flip notElem shifts) pos
+isValid (Tetrimino pos) = length pos == 4 && all isConnectedPos pos
+    where isConnectedPos (y, x) = any (flip elem shifts) pos
                 where shifts = [ (y + 1, x)
-                        , (y - 1, x)
-                        , (y, x + 1)
-                        , (y, x - 1)
-                        ]
+                               , (y - 1, x)
+                               , (y, x + 1)
+                               , (y, x - 1)
+                               ]
 
 
 shift :: Int -> Int -> Tetrimino -> Tetrimino
@@ -82,3 +87,8 @@ normalize = normalizeY . normalizeX
 overlap :: [Tetrimino] -> Tetrimino -> Bool
 overlap ts (Tetrimino tPos) = any ((/= 0) . length . (intersect tPos)) tsPos
     where tsPos = map getPositions ts
+
+
+instance Eq Tetrimino where
+    t1 == t2 = normalizePos t1 == normalizePos t2
+        where normalizePos =  getPositions .normalize
