@@ -1,5 +1,6 @@
 module Solve
     ( solve
+    , solveSize
     , showSolve
     ) where
 
@@ -27,19 +28,20 @@ solveSize ts size = solveRec [] ts
         solveRec :: [Tetrimino] -> [Tetrimino] -> Maybe [Tetrimino]
         solveRec state [] = Just state
         solveRec state ts = do
-            subStates <- sequence $ filter isJust $ map firstValidSpot $ ts
+            subStates <- sequence $ filter isJust $ map (firstValidSpot . normalize) $ ts
             join $ find isJust
                 $ map (\subState@(s:_) -> solveRec subState (delete s ts)) subStates
             where
 
                 firstValidSpot :: Tetrimino -> Maybe [Tetrimino]
                 firstValidSpot t@(Tetrimino pos)
-                    | not $ overlap state t          = Just (t:state)
-                    | any (\(y, _) -> y >= size) pos = Nothing
-                    | any (\(_, x) -> x >= size) pos = firstValidSpot downTetrimino
-                    | otherwise                      = firstValidSpot rightTetrimino
+                    | not $ overlap state t  = Just (t:state)
+                    | inBound rightTetrimino = firstValidSpot rightTetrimino
+                    | inBound downTetrimino  = firstValidSpot downTetrimino
+                    | otherwise              = Nothing
                     where rightTetrimino = shift 0 1 t
                           downTetrimino  = shift 1 0 $ normalizeX t
+                          inBound (Tetrimino pos) = all (\(y, x) -> y < size && x < size) pos
 
 
 showSolve :: [Tetrimino] -> String

@@ -29,7 +29,7 @@ library
       Solve
       Tetrimino
   other-modules:
-      Paths_tetris_fill
+      Paths_fillit
   hs-source-dirs:
       src
   build-depends:
@@ -39,7 +39,7 @@ library
 executable fillit-exe
   main-is: Main.hs
   other-modules:
-      Paths_tetris_fill
+      Paths_fillit
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -52,7 +52,7 @@ test-suite fillit-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_tetris_fill
+      Paths_fillit
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
