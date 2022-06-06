@@ -46,8 +46,15 @@ firstValidSpot size state t@(Tetrimino pos)
 
 showSolve :: [Tetrimino] -> String
 showSolve [] = "Empty solve"
-showSolve ts = foldl1 (zipWith pickIDChar) $ zipWith (showWithSizeAndId size) chars ts
-    where chars = ['A'..'Z'] ++ ['a'..'z'] ++ repeat '#'
-          pickIDChar '.' c = c
-          pickIDChar c   _ = c
-          size = maximum $ map (\x -> maximum (map (uncurry max) (getPositions x))) ts
+showSolve ts = concat
+               $ foldl1 (zipWith pickIDChar)
+               $ map (map (:[]))
+               $ zipWith (showWithSizeAndId size) chars ts
+    where size = maximum $ map (\x -> maximum (map (uncurry max) (getPositions x))) ts
+          chars = ['A'..'Z'] ++ ['a'..'z'] ++ repeat '#'
+          ansiColorCodes = [31..37] ++ [90..97]
+          colorId id = case find ((== head id) . fst) (zip chars ansiColorCodes) of
+                        Just (_, code) -> "\o33[" ++ show code ++ "m" ++ id ++ "\o33[0m"
+                        Nothing        -> id
+          pickIDChar "." id = colorId id
+          pickIDChar id  _  = colorId id
