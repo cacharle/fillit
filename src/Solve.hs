@@ -16,7 +16,7 @@ import Tetrimino
 
 
 solve :: [Tetrimino] -> [Tetrimino]
-solve ts = fromJust $ join $ find isJust $ map (solveSize ts) [(minSize - 1)..]
+solve ts = fromJust $ join $ find isJust $ map (solveSize ts) [minSize..]
     where minSize = ceiling $ logBase 2 $ fromIntegral cellCount
           cellCount = sum $ map (length . getPositions) ts
 

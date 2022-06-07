@@ -12,6 +12,7 @@ module Tetrimino
 
 
 import Data.List (intersect, elemIndices, dropWhileEnd)
+import Data.List.Split (splitOn)
 import Data.Char (isSpace)
 
 
@@ -36,14 +37,8 @@ readTetriminoFromLines ls
 readTetriminos :: String -> Either String [Tetrimino]
 readTetriminos s = let s' = trimSpaces s
                        ls = map trimSpaces (lines s')
-                   in  sequence $ map readTetriminoFromLines $ splitWhen (=="") ls
+                   in  sequence $ map readTetriminoFromLines $ splitOn [""] ls
     where trimSpaces = dropWhile isSpace . dropWhileEnd isSpace
-          -- TODO: install split package
-          splitWhen :: Eq a => (a -> Bool) -> [a] -> [[a]]
-          splitWhen p xs = case dropWhile p xs of
-                              []  -> []
-                              xs' -> x : splitWhen p xs''
-                                  where (x, xs'') = break p xs'
 
 
 showWithSizeAndId :: Int -> Char -> Tetrimino -> String
