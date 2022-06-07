@@ -9,11 +9,6 @@ main = do
     content <- getContents
     case readTetriminos content of
         Left err -> putStrLn $ "Error: Invalid tetriminos format: " ++ err
-        -- Right ts -> mapM_ print ts
-
-        Right ts -> putStr $ showSolve $ solve ts
-
-        -- Right ts -> case solveSize ts 6 of
-        --                 Just ts -> do putStr $ showSolve ts
-        --                               print $ map getPositions ts
-        --                 Nothing -> putStrLn "noooo"
+        Right ts -> if length ts < 1 || length ts > 26
+                    then putStrLn $ "Error: The number of tetriminos in the file must be between 1 and 26"
+                    else putStr $ showSolve $ solve ts

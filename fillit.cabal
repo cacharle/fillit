@@ -7,21 +7,20 @@ cabal-version: 1.12
 name:           fillit
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/fillit#readme>
-homepage:       https://github.com/githubuser/fillit#readme
-bug-reports:    https://github.com/githubuser/fillit/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2022 Author name here
+homepage:       https://github.com/cacharle/fillit#readme
+bug-reports:    https://github.com/cacharle/fillit/issues
+author:         Charles Cabergs
+maintainer:     me@cacharle.xyz
+copyright:      2022 Charles Cabergs
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/fillit
+  location: https://github.com/cacharle/fillit
 
 library
   exposed-modules:
@@ -43,7 +42,7 @@ executable fillit-exe
       Paths_fillit
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O2
   build-depends:
       base >=4.7 && <5
     , fillit
