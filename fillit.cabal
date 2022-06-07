@@ -24,7 +24,6 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
       Solve
       Tetrimino
   other-modules:
@@ -42,7 +41,7 @@ executable fillit-exe
       Paths_fillit
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O2
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O2 -Wall -Wextra
   build-depends:
       base >=4.7 && <5
     , fillit

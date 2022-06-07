@@ -34,6 +34,8 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     - -O2
+    - -Wall
+    - -Wextra
     dependencies:
     - fillit
 
