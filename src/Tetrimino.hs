@@ -102,10 +102,8 @@ normalize :: Tetrimino -> Tetrimino
 normalize = normalizeY . normalizeX
 
 
-overlap :: [Tetrimino] -> Tetrimino -> Bool
-overlap [] _ = False
-overlap ts (Tetrimino _ b) = mask .&. b /= 0
-    where mask = foldl1 (.|.) $ map getBits ts
+overlap :: Int -> Tetrimino -> Bool
+overlap mask (Tetrimino _ b) = mask .&. b /= 0
 
 
 instance Eq Tetrimino where

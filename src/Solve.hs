@@ -5,6 +5,7 @@ module Solve
     ) where
 
 
+import Data.Bits ((.|.))
 import Data.List (find, delete)
 import Data.Maybe (isJust, fromJust)
 import Control.Monad (join)
@@ -36,9 +37,11 @@ solveSize ts size = solveRec [] $ map (scale size) ts
                 $ map (\subState@(s:_) -> solveRec subState (delete s ts)) subStates
             where
 
+                stateMask = foldl (.|.) 0 $ map getBits state
+
                 firstValidSpot :: Tetrimino -> Maybe [Tetrimino]
                 firstValidSpot t
-                    | not $ overlap state t     = Just (t:state)
+                    | not $ overlap stateMask t     = Just (t:state)
                     | not $ hitsBorder DRight t = firstValidSpot rightTetrimino
                     | not $ hitsBorder DDown t  = firstValidSpot downTetrimino
                     | otherwise                 = Nothing
