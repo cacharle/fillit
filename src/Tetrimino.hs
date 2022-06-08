@@ -24,6 +24,9 @@ import Data.Char (isSpace)
 
 import Debug.Trace
 
+import Numeric
+import Data.Char
+
 newtype Positions = Positions { getPositions :: [(Int, Int)] }
 data Tetrimino = Tetrimino { getSize :: Int, getBits :: Int }
 
@@ -60,26 +63,28 @@ scale size t = fromPositionsSize size (toPositions t)
 
 shift :: Int -> Int -> Tetrimino -> Tetrimino
 shift 0 x (Tetrimino size b)
-    | x > 0 = Tetrimino size (b `unsafeShiftL` x)
+    | x >= 0 = Tetrimino size (b `unsafeShiftL` x)
     | x < 0 = Tetrimino size (b `unsafeShiftR` (-x))
 shift y 0 (Tetrimino size b)
-    | y > 0 = Tetrimino size (b `unsafeShiftL` (y * size))
+    | y >= 0 = Tetrimino size (b `unsafeShiftL` (y * size))
     | y < 0 = Tetrimino size (b `unsafeShiftR` ((-y) * size))
 shift y x t = shift y 0 $ shift 0 x t
 
 
 data Direction = DUp | DDown | DLeft | DRight deriving Show
 
+
+showBits :: Int -> String
+showBits b = showIntAtBase 2 intToDigit b ""
+
 hitsBorder :: Direction -> Tetrimino -> Bool
 hitsBorder dir t@(Tetrimino size b) = mask .&. b /= 0
-    where i = size - 1
-          mask = getBits $ fromPositionsSize size (Positions positions)
-          positions = case dir of
-                        DUp    -> [(0, x) | x <- [0..i]]
-                        DDown  -> [(i, x) | x <- [0..i]]
-                        DLeft  -> [(y, 0) | y <- [0..i]]
-                        DRight -> [(y, i) | y <- [0..i]]
-
+    where
+        mask = case dir of
+            DUp    -> (1 `unsafeShiftL` size) - 1
+            DDown  -> ((1 `unsafeShiftL` size) - 1) `unsafeShiftL` (size * (size - 1))
+            DLeft  -> foldl1 (.|.) [1 `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
+            DRight -> foldl1 (.|.) [(1 `unsafeShiftL` (size - 1)) `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
 
 normalizeX :: Tetrimino -> Tetrimino
 normalizeX t@(Tetrimino size b)
