@@ -6,4 +6,8 @@
 - [ ] Tetrimino ID according to the order they are in the file
 - [ ] Benchmarking (http://www.serpentine.com/criterion/tutorial.html)
 - [ ] Print the algorithm's steps in real time
-- [ ] Optimized with bitwise operation
+- [x] Optimized with bitwise operation
+- [ ] haskell stylish formatter
+- [ ] neovim haskell language server
+- [ ] Unit tests
+- [ ] Property tests (with quickcheck)

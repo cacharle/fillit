@@ -60,4 +60,6 @@ test-suite fillit-test
       base >=4.7 && <5
     , fillit
     , split >=0.2
+    , tasty >=1.4
+    , tasty-hunit >=0.10
   default-language: Haskell2010
