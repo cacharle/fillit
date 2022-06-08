@@ -5,15 +5,15 @@ module Solve
     ) where
 
 
-import Data.Bits ((.|.))
-import Data.List (find, delete)
-import Data.Maybe (isJust, fromJust)
-import Control.Monad (join)
-import Control.Applicative ((<|>))
+import           Control.Applicative ((<|>))
+import           Control.Monad       (join)
+import           Data.Bits           ((.|.))
+import           Data.List           (delete, find)
+import           Data.Maybe          (fromJust, isJust)
 
-import Tetrimino
+import           Tetrimino
 
-import Debug.Trace
+import           Debug.Trace
 
 
 solve :: [Tetrimino] -> [Tetrimino]
@@ -41,7 +41,7 @@ solveSize ts size = solveRec [] $ map (scale size) ts
 
                 firstValidSpot :: Tetrimino -> Maybe [Tetrimino]
                 firstValidSpot t
-                    | not $ overlap stateMask t     = Just (t:state)
+                    | not $ overlap stateMask t = Just (t:state)
                     | not $ hitsBorder DRight t = firstValidSpot rightTetrimino
                     | not $ hitsBorder DDown t  = firstValidSpot downTetrimino
                     | otherwise                 = Nothing

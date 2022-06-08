@@ -1,7 +1,7 @@
-import Test.Tasty
-import Test.Tasty.HUnit
+import           Test.Tasty
+import           Test.Tasty.HUnit
 
-import Tetrimino
+import           Tetrimino
 
 main :: IO ()
 main = defaultMain tests

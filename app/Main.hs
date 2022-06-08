@@ -1,7 +1,7 @@
 module Main where
 
-import Tetrimino
-import Solve
+import           Solve
+import           Tetrimino
 
 
 main :: IO ()

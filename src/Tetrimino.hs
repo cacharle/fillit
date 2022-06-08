@@ -17,15 +17,15 @@ module Tetrimino
     ) where
 
 
-import Data.Bits (unsafeShiftR, unsafeShiftL, (.|.), (.&.))
-import Data.List (intersect, elemIndices, dropWhileEnd)
-import Data.List.Split (splitOn)
-import Data.Char (isSpace)
+import           Data.Bits       (unsafeShiftL, unsafeShiftR, (.&.), (.|.))
+import           Data.Char       (isSpace)
+import           Data.List       (dropWhileEnd, elemIndices, intersect)
+import           Data.List.Split (splitOn)
 
-import Debug.Trace
+import           Debug.Trace
 
-import Numeric
-import Data.Char
+import           Data.Char
+import           Numeric
 
 newtype Positions = Positions { getPositions :: [(Int, Int)] }
 data Tetrimino = Tetrimino { getSize :: Int, getBits :: Int }
@@ -83,6 +83,7 @@ hitsBorder dir t@(Tetrimino size b) = mask .&. b /= 0
         mask = case dir of
             DUp    -> (1 `unsafeShiftL` size) - 1
             DDown  -> ((1 `unsafeShiftL` size) - 1) `unsafeShiftL` (size * (size - 1))
+            -- FIX: looping to create a mask is slow (55% of the execution time)
             DLeft  -> foldl1 (.|.) [1 `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
             DRight -> foldl1 (.|.) [(1 `unsafeShiftL` (size - 1)) `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
 
@@ -160,4 +161,4 @@ instance Show Tetrimino where
 
 instance Show Positions where
     show (Positions []) = "Empty Positions"
-    show pos = showPositionsWithSizeAndId (positionsSize pos) '#' pos
+    show pos            = showPositionsWithSizeAndId (positionsSize pos) '#' pos
