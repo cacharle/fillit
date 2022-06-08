@@ -3,6 +3,8 @@ module Tetrimino
     , Positions(..)
     , Direction(..)
     , hitsBorder
+    , hitsBorderMasks
+    , hitsBorderMask
     , fromPositions
     , toPositions
     , scale
@@ -12,8 +14,10 @@ module Tetrimino
     , normalize
     , normalizeY
     , normalizeX
+    , normalizeXMasks
     , overlap
     , showWithSizeAndId
+    , masksFromSize
     ) where
 
 
@@ -77,26 +81,45 @@ data Direction = DUp | DDown | DLeft | DRight deriving Show
 showBits :: Int -> String
 showBits b = showIntAtBase 2 intToDigit b ""
 
-hitsBorder :: Direction -> Tetrimino -> Bool
-hitsBorder dir t@(Tetrimino size b) = mask .&. b /= 0
+masksFromSize :: Int -> (Int, Int, Int, Int)
+masksFromSize size = ( (1 `unsafeShiftL` size) - 1
+                     , ((1 `unsafeShiftL` size) - 1) `unsafeShiftL` (size * (size - 1))
+                     , foldl1 (.|.) [1 `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
+                     , foldl1 (.|.) [(1 `unsafeShiftL` (size - 1)) `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
+                     )
+
+hitsBorderMask :: Int -> Tetrimino -> Bool
+hitsBorderMask mask (Tetrimino _ b) = mask .&. b /= 0
+
+hitsBorderMasks :: Direction -> (Int, Int, Int, Int) -> Tetrimino -> Bool
+hitsBorderMasks dir (up, down, left, right) t@(Tetrimino size b) = mask .&. b /= 0
     where
         mask = case dir of
-            DUp    -> (1 `unsafeShiftL` size) - 1
-            DDown  -> ((1 `unsafeShiftL` size) - 1) `unsafeShiftL` (size * (size - 1))
-            -- FIX: looping to create a mask is slow (55% of the execution time)
-            DLeft  -> foldl1 (.|.) [1 `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
-            DRight -> foldl1 (.|.) [(1 `unsafeShiftL` (size - 1)) `unsafeShiftL` (size * j) | j <- [0..(size - 1)]]
+            DUp    -> up
+            DDown  -> down
+            DLeft  -> left
+            DRight -> right
+
+
+hitsBorder :: Direction -> Tetrimino -> Bool
+hitsBorder dir t@(Tetrimino size _) = hitsBorderMasks dir (masksFromSize size) t
+
+
+normalizeXMasks :: Int -> Tetrimino -> Tetrimino
+normalizeXMasks m t@(Tetrimino size b) =
+    if hitsBorderMask m t
+        then t
+        else normalizeXMasks m $ shift 0 (-1) t
 
 normalizeX :: Tetrimino -> Tetrimino
-normalizeX t@(Tetrimino size b)
-    | hitsBorder DLeft t = t
-    | otherwise = normalizeX $ shift 0 (-1) t
-
+normalizeX t@(Tetrimino size _) = normalizeXMasks leftMask t
+    where (_, _, leftMask, _) = masksFromSize size
 
 normalizeY :: Tetrimino -> Tetrimino
-normalizeY t@(Tetrimino size b)
-    | hitsBorder DUp t = t
-    | otherwise = normalizeY $ shift (-1) 0 t
+normalizeY t@(Tetrimino size b) =
+    if hitsBorder DUp t
+        then t
+        else normalizeY $ shift (-1) 0 t
 
 
 normalize :: Tetrimino -> Tetrimino

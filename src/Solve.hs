@@ -7,7 +7,7 @@ module Solve
 
 import           Control.Applicative ((<|>))
 import           Control.Monad       (join)
-import           Data.Bits           ((.|.))
+import           Data.Bits           ((.|.), unsafeShiftL)
 import           Data.List           (delete, find)
 import           Data.Maybe          (fromJust, isJust)
 
@@ -29,6 +29,8 @@ solveSize :: [Tetrimino] -> Int -> Maybe [Tetrimino]
 solveSize ts size = solveRec [] $ map (scale size) ts
     where
 
+        (_, downMask, leftMask, rightMask) = masksFromSize size
+
         solveRec :: [Tetrimino] -> [Tetrimino] -> Maybe [Tetrimino]
         solveRec state [] = Just state
         solveRec state ts = do
@@ -42,11 +44,11 @@ solveSize ts size = solveRec [] $ map (scale size) ts
                 firstValidSpot :: Tetrimino -> Maybe [Tetrimino]
                 firstValidSpot t
                     | not $ overlap stateMask t = Just (t:state)
-                    | not $ hitsBorder DRight t = firstValidSpot rightTetrimino
-                    | not $ hitsBorder DDown t  = firstValidSpot downTetrimino
+                    | not $ hitsBorderMask rightMask t = firstValidSpot rightTetrimino
+                    | not $ hitsBorderMask downMask t  = firstValidSpot downTetrimino
                     | otherwise                 = Nothing
                     where rightTetrimino = shift 0 1 t
-                          downTetrimino  = shift 1 0 $ normalizeX t
+                          downTetrimino  = shift 1 0 $ normalizeXMasks leftMask t
 
 
 showSolve :: [Tetrimino] -> String
