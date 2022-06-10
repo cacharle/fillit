@@ -34,7 +34,7 @@ solveSize ts size = solveRec [] $ map (scale size) ts
         solveRec :: [Tetrimino] -> [Tetrimino] -> Maybe [Tetrimino]
         solveRec state [] = Just state
         solveRec state ts = do
-            subStates <- sequence $ filter isJust $ map (firstValidSpot ) $ ts
+            subStates <- sequence $ filter isJust $ map firstValidSpot ts
             join $ find isJust
                 $ map (\subState@(s:_) -> solveRec subState (delete s ts)) subStates
             where
